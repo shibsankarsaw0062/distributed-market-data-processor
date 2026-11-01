@@ -1,9 +1,9 @@
 # Distributed Market Data Processor
 
 ## Assignment Details
-* **Student Name:** [Your Name]
-* **Student Roll Number:** [Your Roll Number]
-* **Email ID:** bulusaw0003@gmail.com
+* **Student Name:** Shibsankar Saw
+* **Student Roll Number:** 205226018
+* **Email ID:** shibsankarsaw@gmail.com
 * **Assignment Application Name:** Distributed Market Data Processor
 * **Application Description:** A distributed cloud application that ingests real-time financial market data, processes it concurrently for algorithmic trading feature engineering, and stores the structured data for downstream ML models.
 
