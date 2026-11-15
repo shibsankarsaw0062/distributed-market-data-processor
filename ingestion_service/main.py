@@ -6,7 +6,7 @@ import json
 app = FastAPI(title="Ingestion Microservice")
 
 # URL of our internal processing service
-PROCESSING_SERVICE_URL = "http://localhost:8001/process"
+PROCESSING_SERVICE_URL = "http://processing:8001/process"
 
 @app.websocket("/ws/market-data")
 async def market_data_endpoint(websocket: WebSocket):

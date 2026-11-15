@@ -2,14 +2,15 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import time
 
 app = FastAPI(title="Processing Microservice")
 
-# Database connection configuration
-DB_HOST = "localhost"
+# Database connection configuration for Docker
+DB_HOST = "db"  # Changed from localhost to "db" for Docker network
 DB_NAME = "market_data_db"
 DB_USER = "postgres"
-DB_PASSWORD = "S@4508PShib#" # Change this to your PostgreSQL password
+DB_PASSWORD = "S@4508PShib#" 
 DB_PORT = "5432"
 
 class MarketData(BaseModel):
@@ -28,6 +29,37 @@ def get_db_connection():
     except Exception as e:
         print(f"Database connection failed: {e}")
         return None
+
+def init_db():
+    """Ensure the database table exists, waiting for DB to boot if necessary."""
+    max_retries = 5
+    for i in range(max_retries):
+        conn = get_db_connection()
+        if conn:
+            try:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS market_features (
+                        id SERIAL PRIMARY KEY,
+                        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        original_feed VARCHAR(255) NOT NULL,
+                        trading_signal VARCHAR(10) NOT NULL,
+                        confidence_score FLOAT NOT NULL
+                    );
+                """)
+                conn.commit()
+                print("Database table verified/created successfully.")
+                cursor.close()
+                conn.close()
+                return  # Exit the loop once successful
+            except Exception as e:
+                print(f"Failed to initialize table: {e}")
+        
+        print(f"Database not ready yet, retrying in 3 seconds... ({i+1}/{max_retries})")
+        time.sleep(3)
+
+# Run this once when the microservice boots up
+init_db()
 
 @app.post("/process")
 async def process_data(data: MarketData):
